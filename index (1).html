@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOS</title>
+<style>
+html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;color:#ff3b3b}
+body{background:#0b1030;display:flex;align-items:center;justify-content:center;text-align:center}
+body.fail{background:#2a0610}
+.box{width:80%;max-width:320px}
+h1{font-size:28px;font-weight:bold;margin:0 0 16px}
+p{font-size:16px;margin:12px 0 0}
+.bar{border:2px solid #ff3b3b;height:22px;padding:2px}
+#fill{background:#ff3b3b;height:100%;width:0}
+#pct{font-size:14px;margin-top:8px}
+.s-fail{display:none}
+body.fail .s-load{display:none}
+body.fail .s-fail{display:block}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="s-load">
+    <h1>Sending SOS...</h1>
+    <div class="bar"><div id="fill"></div></div>
+    <div id="pct">0%</div>
+    <p id="msg">Searching for network</p>
+  </div>
+  <div class="s-fail">
+    <h1>Failed to connect</h1>
+    <p>No signal.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var body=document.body, fill=document.getElementById('fill'),
+      pct=document.getElementById('pct'), msg=document.getElementById('msg');
+  var iv=0, to=0, done=false;
+
+  /* TIMING (ms) */
+  var STEP_MS=900;     /* time between each jump of the bar */
+  var FAIL_AT=12000;   /* when "Failed to connect" appears */
+  var STALL=80;        /* bar stops here */
+
+  function start(){
+    clearInterval(iv); clearTimeout(to);
+    done=false;
+    body.className='';
+    var p=0;
+    fill.style.width='0%'; pct.textContent='0%'; msg.textContent='Searching for network';
+    iv=setInterval(function(){
+      if(p<STALL){
+        p=Math.min(STALL,p+Math.floor(Math.random()*12)+3);
+        fill.style.width=p+'%'; pct.textContent=p+'%';
+      }else{
+        msg.textContent='Retrying';
+      }
+    },STEP_MS);
+    to=setTimeout(function(){
+      clearInterval(iv);
+      done=true;
+      body.className='fail';
+    },FAIL_AT);
+  }
+
+  document.addEventListener('click',function(){ if(done){start();} });
+  start();
+})();
+</script>
+</body>
+</html>
